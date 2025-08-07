@@ -14,13 +14,13 @@ class ChannelEnum(enum.Enum):
         MOBILE_BANKING (str): Transactions performed through mobile banking applications.
     """
 
-    ATM = "ATM"
-    TELLER = "TELLER"
-    INTERNET_BANKING = "INTERNET_BANKING"
-    MOBILE_BANKING = "MOBILE_BANKING"
+    ATM = 0
+    TELLER = 1
+    INTERNET_BANKING = 2
+    MOBILE_BANKING = 3
 
 
-class PaymentMethod(enum.Enum):
+class TransactionType(enum.Enum):
     """
     Enumeration representing the available payment methods.
 
