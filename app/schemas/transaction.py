@@ -28,12 +28,11 @@ class PutTransactionRequest(BaseModel):
         Decimal,
         Field(
             ...,
-            gt=0,
             max_digits=15,
             decimal_places=2,
             description=(
-                "Transaction amount, must be greater than zero "
-                "with max 15 digits and 2 decimals"
+                "Transaction amount, can be positive (credit) or negative (debit), "
+                "with up to 15 digits and 2 decimal places."
             ),
         ),
     ]

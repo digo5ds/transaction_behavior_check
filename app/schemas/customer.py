@@ -22,8 +22,21 @@ class PutCustomerRequest(BaseModel):
         str, Field(min_length=1, description="Customer's full name (cannot be empty)")
     ]
     idade: Annotated[
-        int, Field(ge=0, description="Customer's age, must be zero or greater")
+        int, Field(ge=15, description="Customer's age, must be 15 or greater")
     ]
+
+
+class GetCustomerRequest(BaseModel):
+    """
+    Schema for retrieving customer information.
+
+    Attributes:
+        agencia (int): Branch number. Must be zero or positive.
+        conta (int): Account number. Must be zero or positive.
+    """
+
+    agencia: Annotated[int, Field(ge=0, description="Branch number, zero or positive")]
+    conta: Annotated[int, Field(ge=0, description="Account number, zero or positive")]
 
 
 class GetCustomerResponse(BaseModel):
@@ -37,6 +50,7 @@ class GetCustomerResponse(BaseModel):
         balance (float): The current balance of the customer.
     """
 
+    model_config = {"arbitrary_types_allowed": True}
     nome: str
     idade: int
     last_transactions: List[Transaction]

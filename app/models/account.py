@@ -26,5 +26,4 @@ class Account(Base):
     customer = relationship("Customer")
     customer_id = Column(Integer, ForeignKey("customer.id"), nullable=False)
 
-
-__table_args__ = (UniqueConstraint("agency", "account", name="uq_agency_account"),)
+    __table_args__ = (UniqueConstraint("agency", "account", name="uq_agency_account"),)
