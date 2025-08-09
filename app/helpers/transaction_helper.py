@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.helpers.account_helper import AccountHelper
 from app.interfaces.transaction_interface import TransactionInterface
-from app.models.transaction import Transaction
+from app.models.transaction_model import Transaction
 
 
 class TransactionHelper(TransactionInterface):
