@@ -7,12 +7,28 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from app.__version__ import get_version
 from app.core.config import FASTAPI_CONFIG
 from app.routes.customer_routes import router as customer_router
+from app.routes.transaction_routes import router as transaction_router
 
 app = FastAPI(**FASTAPI_CONFIG)
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Handles request validation errors.
+
+    When a request doesn't pass validation, FastAPI raises a
+    `RequestValidationError`. This exception handler is called to
+    generate an appropriate response.
+
+    Args:
+        request (Request): The request that triggered the validation error.
+        exc (RequestValidationError): The exception containing the validation errors.
+
+    Returns:
+        JSONResponse: A JSON response with a 400 status code, containing the
+            validation errors in the response body.
+    """
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"detail": exc.errors()},
@@ -43,6 +59,7 @@ def version():
 
 api_router = APIRouter()
 api_router.include_router(customer_router, tags=["customers"])
+api_router.include_router(transaction_router, tags=["transaction"])
 app.include_router(api_router)
 
 if __name__ == "__main__":
