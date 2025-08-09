@@ -6,13 +6,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.core.constants import ChannelEnum, TransactionType
+from app.core.constants import ChannelEnum
 from app.core.postgres_database import get_db
 from app.helpers.account_helper import AccountHelper
-from app.helpers.customer_helper import CustomerHelper
 from app.helpers.transaction_helper import TransactionHelper
-from app.models.account import Account
-from app.models.transaction import Transaction
+from app.models.account_model import Account
+from app.models.transaction_model import Transaction
 from app.schemas.transaction import PutTransactionRequest
 
 router = APIRouter(prefix="/api/transaction")
@@ -44,7 +43,6 @@ def put_transaction(
     )
     try:
         channel = ChannelEnum(data.canal)
-        transaction_type = TransactionType(0)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
