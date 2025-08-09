@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Annotated
+from typing import Annotated, List
 
 from pydantic import BaseModel, Field
 
@@ -36,7 +36,6 @@ class PutTransactionRequest(BaseModel):
             ),
         ),
     ]
-    canal: Annotated[int, Field(..., ge=0, description="Channel code")]
     agencia_de_origem: Annotated[
         int, Field(..., ge=0, description="Origin branch number")
     ]
@@ -51,12 +50,11 @@ class PutTransactionRequest(BaseModel):
     ]
 
 
-class TransactionResponse(BaseModel):
-    """
-    Represents the response for a transaction behavior check.
-
-    Attributes:
-        suspect (bool): Indicates whether the transaction is considered suspicious.
-    """
-
+class TransactionSummary(BaseModel):
+    agencia: int
+    conta: int
+    type: str  # 'debit' ou 'credit'
+    valor: float
+    nome: str
+    idade: int
     suspect: bool

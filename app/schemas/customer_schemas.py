@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated, List, Literal
 
 from pydantic import BaseModel, Field
 
@@ -55,3 +55,4 @@ class GetCustomerResponse(BaseModel):
     idade: int
     last_transactions: List[Transaction]
     balance: float
+    type: Literal["credit", "debit"]
