@@ -7,14 +7,12 @@ from sqlalchemy import (
     CheckConstraint,
     Column,
     DateTime,
-    Enum,
     ForeignKey,
     Integer,
     Numeric,
 )
 from sqlalchemy.orm import relationship
 
-from app.core.constants import ChannelEnum, TransactionType
 from app.core.postgres_database import Base
 
 

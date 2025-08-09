@@ -2,7 +2,7 @@
 
 from typing import List
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from app.schemas.transaction_schemas import TransactionSummary
 
