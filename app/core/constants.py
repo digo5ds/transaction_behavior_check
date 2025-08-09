@@ -3,15 +3,15 @@
 import enum
 
 
-class ChannelEnum(enum.Enum):
+class ChannelEnum(enum.IntEnum):
     """
     Enumeration representing the various channels through which a transaction can be performed.
 
-    Attributes:
-        ATM (str): Transactions performed via Automated Teller Machines.
-        TELLER (str): Transactions performed at a bank teller.
-        INTERNET_BANKING (str): Transactions performed through internet banking platforms.
-        MOBILE_BANKING (str): Transactions performed through mobile banking applications.
+    Integer values assigned to each channel:
+        ATM = 0 (Automated Teller Machine)
+        TELLER = 1 (Bank teller counter)
+        INTERNET_BANKING = 2 (Internet banking platform)
+        MOBILE_BANKING = 3 (Mobile banking application)
     """
 
     ATM = 0
@@ -20,7 +20,7 @@ class ChannelEnum(enum.Enum):
     MOBILE_BANKING = 3
 
 
-class TransactionType(enum.Enum):
+class TransactionType(enum.IntEnum):
     """
     Enumeration representing the available payment methods.
 
@@ -29,5 +29,9 @@ class TransactionType(enum.Enum):
         DEBIT: Represents payment made using a debit method.
     """
 
-    CREDIT = "CREDIT"
-    DEBIT = "DEBIT"
+    CREDIT = 0
+    DEBIT = 1
+
+
+x = ChannelEnum(0)
+print(x)
