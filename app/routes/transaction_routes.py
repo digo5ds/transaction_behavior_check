@@ -56,7 +56,6 @@ def put_transaction(
         destination_account_rel=account_helper.get_account(dest_account),
         amount=data.valor_da_transacao,
         channel=channel,
-        type=transaction_type,  # TODO: remover isso
         suspect=False,  # TODO: implementar calculo de risco
         transaction_date=datetime.fromtimestamp(data.data_e_hora_da_transacao),
     )
