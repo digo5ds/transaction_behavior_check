@@ -23,7 +23,7 @@ class Account(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     account = Column(Integer)
     agency = Column(Integer)
-    customer = relationship("Customer")
+    rel_customer = relationship("Customer")
     customer_id = Column(Integer, ForeignKey("customer.id"), nullable=False)
 
     __table_args__ = (UniqueConstraint("agency", "account", name="uq_agency_account"),)

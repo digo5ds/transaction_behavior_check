@@ -1,7 +1,6 @@
 """Models for representing customers."""
 
 from datetime import datetime
-from typing import List
 
 from sqlalchemy import (
     Boolean,
@@ -46,9 +45,8 @@ class Transaction(Base):
     transaction_date = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=datetime.now(), nullable=False)
     amount = Column(Numeric(precision=10, scale=2), nullable=False)
-    channel = Column(Enum(ChannelEnum), nullable=False)
+    channel = Column(Integer, nullable=False)
     suspect = Column(Boolean, default=False)
-    type = Column(Enum(TransactionType), nullable=False)
     # Foreign keys
     origin_account_id = Column(Integer, ForeignKey("account.id"), nullable=False)
     destination_account_id = Column(Integer, ForeignKey("account.id"), nullable=False)

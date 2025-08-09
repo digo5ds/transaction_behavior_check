@@ -6,9 +6,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, aliased
 
 from app.interfaces.account_interface import AccountInterface
-from app.models.account import Account
-from app.models.customer import Customer
-from app.models.transaction import Transaction
+from app.models.account_model import Account
+from app.models.customer_model import Customer
+from app.models.transaction_model import Transaction
 
 
 class AccountHelper(AccountInterface):
