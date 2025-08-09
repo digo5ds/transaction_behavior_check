@@ -1,8 +1,10 @@
+"""Account Schemas"""
+
 from typing import List
 
 from pydantic import BaseModel, Field
 
-from app.schemas.transaction import TransactionSummary
+from app.schemas.transaction_schemas import TransactionSummary
 
 
 class AccountInfoResponse(BaseModel):

@@ -1,8 +1,10 @@
+"""Customer Schemas"""
+
 from typing import Annotated, List, Literal
 
 from pydantic import BaseModel, Field
 
-from app.models.transaction import Transaction
+from app.models.transaction_model import Transaction
 
 
 class PutCustomerRequest(BaseModel):

@@ -1,5 +1,7 @@
+"""Transaction Schemas"""
+
 from decimal import Decimal
-from typing import Annotated, List
+from typing import Annotated
 
 from pydantic import BaseModel, Field
 

@@ -12,7 +12,7 @@ from app.helpers.account_helper import AccountHelper
 from app.helpers.transaction_helper import TransactionHelper
 from app.models.account_model import Account
 from app.models.transaction_model import Transaction
-from app.schemas.transaction import PutTransactionRequest
+from app.schemas.transaction_schemas import PutTransactionRequest
 
 router = APIRouter(prefix="/api/transaction")
 
