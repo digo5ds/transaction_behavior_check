@@ -1,7 +1,10 @@
 """Transaction Schemas"""
 
+import hashlib
+import time
+from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -22,9 +25,21 @@ class PutTransactionRequest(BaseModel):
         conta_de_destino (int): Destination account number (must be greater than or equal to 0).
     """
 
-    id_da_transacao: Annotated[str, Field(..., description="Transaction ID")]
+    id_da_transacao: Annotated[
+        str,
+        Field(
+            ...,
+            description="Transaction ID",
+            example=hashlib.sha256(str(datetime.now()).encode()).hexdigest(),
+        ),
+    ]
     data_e_hora_da_transacao: Annotated[
-        int, Field(..., description="Transaction timestamp as UNIX epoch")
+        datetime,
+        Field(
+            ...,
+            description="Transaction timestamp as UNIX epoch",
+            example=(datetime.now() - timedelta(hours=3)).timestamp(),
+        ),
     ]
     valor_da_transacao: Annotated[
         Decimal,
@@ -50,12 +65,25 @@ class PutTransactionRequest(BaseModel):
     conta_de_destino: Annotated[
         int, Field(..., ge=0, description="Destination account number")
     ]
+    canal: Annotated[int, Field(..., ge=0, description="Channel code")]
 
 
 class TransactionSummary(BaseModel):
+    """
+    TransactionSummary defines the schema for a transaction summary.
+    Attributes:
+        agencia (int): Branch number.
+        conta (int): Account number.
+        type (Literal["credit", "debit"]): Transaction type.
+        valor (float): Transaction amount.
+        nome (str): Customer name.
+        idade (int): Customer age.
+        suspect (bool): Whether the customer is a suspect.
+    """
+
     agencia: int
     conta: int
-    type: str  # 'debit' ou 'credit'
+    type: Literal["credit", "debit"]
     valor: float
     nome: str
     idade: int

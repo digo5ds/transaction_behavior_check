@@ -82,7 +82,7 @@ class AccountHelper(AccountInterface):
         tx_query = (
             self.db.query(
                 Transaction.id.label("tx_id"),
-                Transaction.transaction_date,
+                Transaction.created_at,
                 case(
                     (Transaction.origin_account_id == account.id, "debit"),
                     else_="credit",
@@ -116,7 +116,7 @@ class AccountHelper(AccountInterface):
                     Transaction.destination_account_id == account.id,
                 )
             )
-            .order_by(desc(Transaction.transaction_date))
+            .order_by(desc(Transaction.created_at))
             .limit(last_n)
             .subquery()
         )

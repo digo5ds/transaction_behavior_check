@@ -22,7 +22,6 @@ class Transaction(Base):
 
     Attributes:
         id (int): Primary key, unique identifier for the transaction.
-        transaction_date (datetime): The date and time when the transaction occurred.
         created_at (datetime): Timestamp when the transaction record was created.
         amount (Decimal): The monetary value of the transaction.
         channel (ChannelEnum): The channel through which the transaction was made.
@@ -40,8 +39,7 @@ class Transaction(Base):
     __tablename__ = "transaction"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    transaction_date = Column(DateTime, nullable=False)
-    created_at = Column(DateTime, default=datetime.now(), nullable=False)
+    created_at = Column(DateTime, nullable=False)
     amount = Column(Numeric(precision=10, scale=2), nullable=False)
     channel = Column(Integer, nullable=False)
     suspect = Column(Boolean, default=False)

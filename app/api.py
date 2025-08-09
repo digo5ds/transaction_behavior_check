@@ -14,21 +14,6 @@ app = FastAPI(**FASTAPI_CONFIG)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """
-    Handles request validation errors.
-
-    When a request doesn't pass validation, FastAPI raises a
-    `RequestValidationError`. This exception handler is called to
-    generate an appropriate response.
-
-    Args:
-        request (Request): The request that triggered the validation error.
-        exc (RequestValidationError): The exception containing the validation errors.
-
-    Returns:
-        JSONResponse: A JSON response with a 400 status code, containing the
-            validation errors in the response body.
-    """
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"detail": exc.errors()},

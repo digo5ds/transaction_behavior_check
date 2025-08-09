@@ -6,9 +6,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.config import rules
 from app.core.constants import ChannelEnum
 from app.core.postgres_database import get_db
 from app.helpers.account_helper import AccountHelper
+from app.helpers.risk_engine_helper import RiskEvaluator
 from app.helpers.transaction_helper import TransactionHelper
 from app.models.account_model import Account
 from app.models.transaction_model import Transaction
@@ -17,7 +19,7 @@ from app.schemas.transaction_schemas import PutTransactionRequest
 router = APIRouter(prefix="/api/transaction")
 
 
-@router.put("/", status_code=status.HTTP_201_CREATED)
+@router.put("/create", status_code=status.HTTP_201_CREATED)
 def put_transaction(
     data: PutTransactionRequest,
     db: Session = Depends(get_db),
@@ -41,6 +43,7 @@ def put_transaction(
     dest_account = Account(
         agency=data.agencia_de_destino, account=data.conta_de_destino
     )
+    risk_evaluator = RiskEvaluator()
     try:
         channel = ChannelEnum(data.canal)
     except ValueError as e:
@@ -51,14 +54,17 @@ def put_transaction(
 
     transaction_helper = TransactionHelper(db)
     account_helper = AccountHelper(db)
+
     transaction = Transaction(
         origin_account_rel=account_helper.get_account(origin_account),
         destination_account_rel=account_helper.get_account(dest_account),
         amount=data.valor_da_transacao,
         channel=channel,
-        suspect=False,  # TODO: implementar calculo de risco
-        transaction_date=datetime.fromtimestamp(data.data_e_hora_da_transacao),
+        created_at=data.data_e_hora_da_transacao.replace(tzinfo=None),
     )
+    is_suspect = risk_evaluator.calculate_risk(transaction=transaction, rules=rules)
+    transaction.suspect = is_suspect
+
     try:
         transaction_helper.insert(transaction)
 

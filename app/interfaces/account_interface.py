@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from app.models.account import Account
+from app.models.account_model import Account
 
 
 class AccountInterface(ABC):

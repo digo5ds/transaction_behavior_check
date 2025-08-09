@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.helpers.account_helper import AccountHelper
 from app.helpers.transaction_helper import TransactionHelper
 from app.interfaces.customer_interface import CustomerInterface
-from app.models.customer import Customer
+from app.models.customer_model import Customer
 
 
 class CustomerHelper(CustomerInterface):

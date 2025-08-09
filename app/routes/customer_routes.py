@@ -9,8 +9,8 @@ from app.helpers.account_helper import AccountHelper
 from app.helpers.customer_helper import CustomerHelper
 from app.models.account_model import Account
 from app.models.customer_model import Customer
-from app.schemas.account import AccountInfoResponse
-from app.schemas.customer import GetCustomerRequest, PutCustomerRequest
+from app.schemas.account_schemas import AccountInfoResponse
+from app.schemas.customer_schemas import GetCustomerRequest, PutCustomerRequest
 
 router = APIRouter(prefix="/api/customers")
 
@@ -85,7 +85,13 @@ def get_customer_info(agencia: int, conta: int, db: Session = Depends(get_db)):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Account not found"
             )
-        return AccountInfoResponse(**account_helper.get_account_report(account))
+        result = account_helper.get_account_report(account)
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Account without transactions",
+            )
+        return AccountInfoResponse(**result)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)

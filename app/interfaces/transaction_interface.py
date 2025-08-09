@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from app.models.transaction import Transaction
+from app.models.transaction_model import Transaction
 
 
 class TransactionInterface(ABC):

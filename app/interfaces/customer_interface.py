@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from app.models.customer import Customer
+from app.models.customer_model import Customer
 
 
 class CustomerInterface(ABC):
