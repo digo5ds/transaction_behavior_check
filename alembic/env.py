@@ -4,9 +4,11 @@ from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 from app.core.postgres_database import DATABASE_URL, Base
-from app.models.account import Account  # pylint: disable=unused-import
-from app.models.customer import Customer  # pylint: disable=unused-import
-from app.models.transaction import Transaction  # pylint: disable=unused-import
+from app.models.tables.account_model import Account  # pylint: disable=unused-import
+from app.models.tables.customer_model import Customer  # pylint: disable=unused-import
+from app.models.tables.transaction_model import (
+    Transaction,  # pylint: disable=unused-import
+)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

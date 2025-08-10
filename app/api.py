@@ -14,6 +14,20 @@ app = FastAPI(**FASTAPI_CONFIG)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Handles request validation errors.
+
+    This exception handler is called when a request contains invalid data that
+    fails the validation defined in the endpoint. It returns a JSON response with
+    the same status code and error details as the original `RequestValidationError`.
+
+    Args:
+        request (Request): The request object that contains the invalid data.
+        exc (RequestValidationError): The exception raised due to the invalid data.
+
+    Returns:
+        JSONResponse: A JSON response with the error details.
+    """
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"detail": exc.errors()},
@@ -22,7 +36,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.get("/", include_in_schema=False)
 def docs():
-    """Redirects the root URL to the API documentation.
+    """
+    Redirects the root URL to the API documentation.
 
     This endpoint is not included in the OpenAPI schema, serving only as
     a convenience for users to quickly access the documentation.
@@ -33,7 +48,8 @@ def docs():
 
 @app.get("/version", include_in_schema=False)
 def version():
-    """Returns the version of the application.
+    """
+    Returns the version of the application.
 
     This endpoint is not included in the OpenAPI schema, serving only as
     a convenience for users to check the current version of the application.

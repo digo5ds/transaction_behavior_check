@@ -4,7 +4,8 @@ from typing import Annotated, List, Literal
 
 from pydantic import BaseModel, Field
 
-from app.models.transaction_model import Transaction
+from app.models.tables.account_model import Account
+from app.models.tables.transaction_model import Transaction
 
 
 class PutCustomerRequest(BaseModel):

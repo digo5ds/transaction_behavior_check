@@ -2,10 +2,11 @@
 
 from abc import ABC, abstractmethod
 
-from app.models.account_model import Account
+from app.models.tables.account_model import Account
 
 
 class AccountInterface(ABC):
+    """Interface for account_helper"""
 
     def insert(self, account: Account):
         """

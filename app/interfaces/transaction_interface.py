@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from app.models.transaction_model import Transaction
+from app.models.tables.transaction_model import Transaction
 
 
 class TransactionInterface(ABC):
@@ -12,4 +12,13 @@ class TransactionInterface(ABC):
 
     @abstractmethod
     def insert(self, transaction: Transaction):
-        pass
+        """
+        Save a transaction record into the database.
+
+        Args:
+            transaction (Transaction): The transaction data to be saved.
+
+        Raises:
+            NotImplementedError: This method must be overridden in a subclass.
+        """
+        raise NotImplementedError

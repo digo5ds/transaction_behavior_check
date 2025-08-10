@@ -2,12 +2,12 @@
 
 from abc import ABC, abstractmethod
 
-from app.models.customer_model import Customer
+from app.models.tables.customer_model import Customer
 
 
 class CustomerInterface(ABC):
     """
-    Abstract base class that defines the interface for a customer object.
+    Interface for customer_helper
     """
 
     @abstractmethod
@@ -20,6 +20,9 @@ class CustomerInterface(ABC):
 
         Returns:
             Customer: The saved customer object.
+
+        Raises:
+            Exception: If any error occurs during the insertion.
         """
         raise NotImplementedError()
 

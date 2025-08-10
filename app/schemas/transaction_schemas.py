@@ -1,7 +1,6 @@
 """Transaction Schemas"""
 
 import hashlib
-import time
 from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Annotated, Literal
@@ -30,7 +29,7 @@ class PutTransactionRequest(BaseModel):
         Field(
             ...,
             description="Transaction ID",
-            example=hashlib.sha256(str(datetime.now()).encode()).hexdigest(),
+            example=hashlib.sha256(str(datetime.now().second).encode()).hexdigest(),
         ),
     ]
     data_e_hora_da_transacao: Annotated[
@@ -38,7 +37,7 @@ class PutTransactionRequest(BaseModel):
         Field(
             ...,
             description="Transaction timestamp as UNIX epoch",
-            example=(datetime.now() - timedelta(hours=3)).timestamp(),
+            example=int((datetime.now() - timedelta(hours=3)).timestamp()),
         ),
     ]
     valor_da_transacao: Annotated[

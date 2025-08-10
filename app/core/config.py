@@ -7,13 +7,13 @@ from app.__version__ import get_version
 POSTGRES_USER = os.getenv("POSTGRES_USER")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 POSTGRES_DB = os.getenv("POSTGRES_DB")
-POSTGRES_PORT = os.getenv("POSTGRES_PORT")
-POSTIGRES_HOST = "localhost"
+POSTGRES_PORT = int(os.getenv("POSTGRES_PORT"))
+POSTGRES_HOST = "localhost"
 
 # MongoDB
-MONGO_INITDB_ROOT_USERNAME = os.getenv("MONGO_INITDB_ROOT_USERNAME")
-MONGO_INITDB_ROOT_PASSWORD = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
-MONGO_PORT = os.getenv("MONGO_PORT")
+MONGO_USERNAME = os.getenv("MONGO_USERNAME")
+MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
+MONGO_PORT = int(os.getenv("MONGO_PORT"))
 MONGO_DB = os.getenv("MONGO_DB")
 MONGO_HOST = "localhost"
 
@@ -58,7 +58,7 @@ rules = {
                     {
                         "field": "amount",
                         "op": "$gte",
-                        "value": 1000,
+                        "value": 10000,
                     },
                 ]
             },
@@ -111,11 +111,10 @@ rules = {
             "filter": {
                 "$and": [
                     {
-                        "field": "transaction_id",
                         "transform": "!count",
                         "params": {"channel": ["IBK", "MBK"]},
-                        "op": "$gte",
-                        "value": 2,
+                        "op": "lte",
+                        "value": 5,
                     },
                     {
                         "field": "created_at",

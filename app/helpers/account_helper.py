@@ -4,20 +4,19 @@ from sqlalchemy import case, cast, desc, func, literal, or_
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, aliased
+from sqlalchemy.sql.selectable import Subquery
 
+from app.core.postgres_database import get_db
 from app.interfaces.account_interface import AccountInterface
-from app.models.account_model import Account
-from app.models.customer_model import Customer
-from app.models.transaction_model import Transaction
+from app.models.tables.account_model import Account
+from app.models.tables.customer_model import Customer
+from app.models.tables.transaction_model import Transaction
 
 
 class AccountHelper(AccountInterface):
     """
     Helper class for account-related database operations.
     """
-
-    def __init__(self, db: Session):
-        self.db: Session = db
 
     def save_account(self, account: Account):
         """
@@ -30,14 +29,28 @@ class AccountHelper(AccountInterface):
             SQLAlchemyError: If an error occurs during the database operation,
                 the transaction is rolled back and the exception is raised.
         """
-        try:
-            self.db.add(account)
-            self.db.commit()
-        except SQLAlchemyError as e:
-            self.db.rollback()
-            raise e
+        with get_db() as db:
+            try:
+                db.add(account)
+                db.commit()
+            except SQLAlchemyError as e:
+                db.rollback()
+                raise e
 
-    def __get_balance_subquery(self, account: Account):
+    def __get_balance_subquery(self, account: Account, db: Session) -> Subquery:
+        """
+        Creates a subquery to calculate the balance of a given account.
+
+        Args:
+            account (Account): The account for which to calculate the balance.
+            db (Session): The database session.
+
+        Returns:
+            Subquery: A SQLAlchemy subquery that calculates the balance by summing
+                    the transaction amounts where the account is either the origin
+                    or the destination. Credits are added and debits are subtracted.
+        """
+
         balance_expr = func.coalesce(
             func.sum(
                 case(
@@ -63,7 +76,7 @@ class AccountHelper(AccountInterface):
         )
 
         return (
-            self.db.query(balance_expr.label("balance"))
+            db.query(balance_expr.label("balance"))
             .filter(
                 or_(
                     Transaction.origin_account_id == account.id,
@@ -73,14 +86,34 @@ class AccountHelper(AccountInterface):
             .subquery()
         )
 
-    def __get_transactions_subquery(self, account: Account, last_n=10):
+    def __get_transactions_subquery(
+        self, account: Account, last_n: int, db: Session
+    ) -> Subquery:
+        """
+        Constructs a subquery to retrieve a list of transactions for a given account.
+
+        The query selects transaction details including transaction ID, creation date,
+        transaction type (debit or credit), associated account and customer details, amount,
+        and whether the transaction is marked as suspicious. It joins the transactions with
+        the associated origin and destination accounts and their respective customers.
+
+        Args:
+            account (Account): The account for which transactions are to be retrieved.
+            last_n (int, optional): The number of most recent transactions to retrieve.
+                Defaults to 10.
+            db (Session): The database session.
+
+        Returns:
+            Subquery: A SQLAlchemy subquery object representing the transaction details
+            for the specified account, limited to the specified number of recent entries.
+        """
         origin_acc = aliased(Account)
         dest_acc = aliased(Account)
         origin_cust = aliased(Customer)
         dest_cust = aliased(Customer)
 
         tx_query = (
-            self.db.query(
+            db.query(
                 Transaction.id.label("tx_id"),
                 Transaction.created_at,
                 case(
@@ -124,67 +157,82 @@ class AccountHelper(AccountInterface):
         # Retorna a query original (não executa), pois vamos usar json_agg na query principal
         return tx_query
 
-    def get_account_report(self, account: Account, last_n=5):
-        customer_subq = (
-            self.db.query(Customer)
-            .filter(Customer.id == account.customer_id)
-            .subquery()
-        )
+    def get_account_report(self, account: Account, last_n=5) -> dict:
+        """
+        Retrieves an account report from the database.
 
-        balance_subq = self.__get_balance_subquery(account)
+        Args:
+            account (Account): The account object whose report is to be retrieved.
+            last_n (int): The number of last transactions to include in the report.
 
-        transactions_subq = self.__get_transactions_subquery(account, last_n)
+        Returns:
+            AccountInfoResponse: The account report object.
 
-        # Query principal juntando tudo
-        query = (
-            self.db.query(
-                customer_subq.c.name.label("nome"),
-                customer_subq.c.age.label("idade"),
-                balance_subq.c.balance,
-                func.coalesce(
-                    func.json_agg(
-                        func.json_build_object(
-                            "agencia",
-                            transactions_subq.c.agencia,
-                            "conta",
-                            transactions_subq.c.conta,
-                            "type",
-                            transactions_subq.c.tx_type,
-                            "valor",
-                            transactions_subq.c.amount,
-                            "nome",
-                            transactions_subq.c.nome,
-                            "idade",
-                            transactions_subq.c.idade,
-                            "suspect",
-                            transactions_subq.c.suspect,
-                        )
-                    ).filter(transactions_subq.c.tx_id is not None),
-                    cast("[]", type_=JSON),
-                ).label("last_transactions"),
+        Raises:
+            SQLAlchemyError: If an error occurs during the database operation,
+                the exception is raised.
+        """
+
+        with get_db() as db:
+            customer_subq = (
+                db.query(Customer).filter(Customer.id == account.customer_id).subquery()
             )
-            .select_from(customer_subq)
-            .join(balance_subq, literal(True))
-            .join(transactions_subq, literal(True))
-        ).group_by(
-            customer_subq.c.name,
-            customer_subq.c.age,
-            balance_subq.c.balance,
-        )
 
-        result = query.first()
+            balance_subq = self.__get_balance_subquery(account, db)
 
-        if not result:
-            return None
+            transactions_subq = self.__get_transactions_subquery(account, last_n, db)
+            try:
+                query = (
+                    db.query(
+                        customer_subq.c.name.label("nome"),
+                        customer_subq.c.age.label("idade"),
+                        balance_subq.c.balance,
+                        func.coalesce(
+                            func.json_agg(
+                                func.json_build_object(
+                                    "agencia",
+                                    transactions_subq.c.agencia,
+                                    "conta",
+                                    transactions_subq.c.conta,
+                                    "type",
+                                    transactions_subq.c.tx_type,
+                                    "valor",
+                                    transactions_subq.c.amount,
+                                    "nome",
+                                    transactions_subq.c.nome,
+                                    "idade",
+                                    transactions_subq.c.idade,
+                                    "suspect",
+                                    transactions_subq.c.suspect,
+                                )
+                            ).filter(transactions_subq.c.tx_id.isnot(None)),
+                            cast("[]", type_=JSON),
+                        ).label("last_transactions"),
+                    )
+                    .select_from(customer_subq)
+                    .join(balance_subq, literal(True))
+                    .join(transactions_subq, literal(True))
+                ).group_by(
+                    customer_subq.c.name,
+                    customer_subq.c.age,
+                    balance_subq.c.balance,
+                )
 
-        return {
-            "nome": result.nome,
-            "idade": result.idade,
-            "balance": float(result.balance),
-            "last_transactions": result.last_transactions or [],
-        }
+                result = query.first()
 
-    def get_account(self, account_data: Account) -> Account:
+                if not result:
+                    return None
+
+                return {
+                    "nome": result.nome,
+                    "idade": result.idade,
+                    "balance": float(result.balance),
+                    "last_transactions": result.last_transactions or [],
+                }
+            except SQLAlchemyError as e:
+                raise e
+
+    def get_account(self, account_data: Account) -> Account | None:
         """
         Retrieves an account from the database.
 
@@ -198,14 +246,15 @@ class AccountHelper(AccountInterface):
             SQLAlchemyError: If an error occurs during the database operation,
                 the transaction is rolled back and the exception is raised.
         """
-        try:
-            return (
-                self.db.query(Account)
-                .filter(
-                    Account.agency == account_data.agency,
-                    Account.account == account_data.account,
+        with get_db() as db:
+            try:
+                return (
+                    db.query(Account)
+                    .filter(
+                        Account.agency == account_data.agency,
+                        Account.account == account_data.account,
+                    )
+                    .first()
                 )
-                .first()
-            )
-        except SQLAlchemyError as e:
-            raise e
+            except SQLAlchemyError as e:
+                raise e

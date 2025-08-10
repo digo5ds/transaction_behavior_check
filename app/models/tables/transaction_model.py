@@ -10,10 +10,12 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     Numeric,
+    String,
 )
 from sqlalchemy.orm import relationship
 
 from app.core.postgres_database import Base
+from app.models.tables.account_model import Account
 
 
 class Transaction(Base):
@@ -38,7 +40,7 @@ class Transaction(Base):
 
     __tablename__ = "transaction"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String, primary_key=True)
     created_at = Column(DateTime, nullable=False)
     amount = Column(Numeric(precision=10, scale=2), nullable=False)
     channel = Column(Integer, nullable=False)

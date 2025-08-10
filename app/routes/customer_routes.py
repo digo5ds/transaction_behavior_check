@@ -1,14 +1,12 @@
 """ "Customer routes"""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
 
-from app.core.postgres_database import get_db
 from app.helpers.account_helper import AccountHelper
 from app.helpers.customer_helper import CustomerHelper
-from app.models.account_model import Account
-from app.models.customer_model import Customer
+from app.models.tables.account_model import Account
+from app.models.tables.customer_model import Customer
 from app.schemas.account_schemas import AccountInfoResponse
 from app.schemas.customer_schemas import GetCustomerRequest, PutCustomerRequest
 
@@ -16,12 +14,7 @@ router = APIRouter(prefix="/api/customers")
 
 
 @router.put("/{agencia}/{conta}", status_code=status.HTTP_201_CREATED)
-def put_customer(
-    agencia: int,
-    conta: int,
-    data: PutCustomerRequest,
-    db: Session = Depends(get_db),
-):
+def put_customer(agencia: int, conta: int, data: PutCustomerRequest):
     """
     Creates a new customer with the given agency, account, name, and age.
 
@@ -43,14 +36,14 @@ def put_customer(
             detail="Agency and account numbers do not match. Update is not allowed",
         )
 
-    customer_helper = CustomerHelper(db)
-    account_helper = AccountHelper(db)
+    customer_helper = CustomerHelper()
+    account_helper = AccountHelper()
     customer = Customer(name=data.nome, age=data.idade)
     account = Account(agency=data.agencia, account=data.conta)
-    account.rel_customer = customer
 
     try:
-        customer_helper.insert(customer=customer)
+        customer = customer_helper.insert(customer=customer)
+        account.customer_id = customer.id
         account_helper.save_account(account=account)
     except IntegrityError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
@@ -58,7 +51,7 @@ def put_customer(
 
 
 @router.get("/{agencia}/{conta}")
-def get_customer_info(agencia: int, conta: int, db: Session = Depends(get_db)):
+def get_customer_info(agencia: int, conta: int):
     """
     Retrieves a customer's information based on their agency and account numbers.
 
@@ -73,26 +66,21 @@ def get_customer_info(agencia: int, conta: int, db: Session = Depends(get_db)):
     Raises:
         HTTPException: If the account is not found or if any unexpected error occurs.
     """
-    try:
-        account_helper = AccountHelper(db)
-        request_model = GetCustomerRequest(agencia=agencia, conta=conta)
+    account_helper = AccountHelper()
+    request_model = GetCustomerRequest(agencia=agencia, conta=conta)
 
-        account = account_helper.get_account(
-            Account(agency=request_model.agencia, account=request_model.conta)
-        )
+    account = account_helper.get_account(
+        Account(agency=request_model.agencia, account=request_model.conta)
+    )
 
-        if account is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Account not found"
-            )
-        result = account_helper.get_account_report(account)
-        if not result:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Account without transactions",
-            )
-        return AccountInfoResponse(**result)
-    except Exception as e:
+    if account is None:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        ) from e
+            status_code=status.HTTP_404_NOT_FOUND, detail="Account not found"
+        )
+    result = account_helper.get_account_report(account)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Account without transactions",
+        )
+    return AccountInfoResponse(**result)

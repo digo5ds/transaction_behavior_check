@@ -7,7 +7,7 @@ from pydantic import BaseModel, RootModel
 
 class SimpleCondition(BaseModel):
     field: str
-    op: Literal["$eq", "$lt", "$gt", "$gte", "$lte"]
+    op: Literal["eq", "lt", "gt", "gte", "lte", "in"]
     value: Any
     transform: Optional[str] = None
     params: Optional[Dict[str, Any]] = None
@@ -15,7 +15,7 @@ class SimpleCondition(BaseModel):
 
 class FilterCondition(
     RootModel[
-        Union[Dict[Literal["$and", "$or"], List["FilterCondition"]], SimpleCondition]
+        Union[Dict[Literal["and", "or"], List["FilterCondition"]], SimpleCondition]
     ]
 ):
     pass

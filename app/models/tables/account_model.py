@@ -2,6 +2,7 @@ from sqlalchemy import Column, ForeignKey, Integer, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from app.core.postgres_database import Base
+from app.models.tables.customer_model import Customer
 
 
 class Account(Base):
@@ -23,6 +24,9 @@ class Account(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     account = Column(Integer)
     agency = Column(Integer)
-    rel_customer = relationship("Customer")
     customer_id = Column(Integer, ForeignKey("customer.id"), nullable=False)
+    customer_rel = relationship(
+        "Customer",
+        back_populates="accounts",  # nome do atributo no modelo Customer que referencia accounts
+    )
     __table_args__ = (UniqueConstraint("agency", "account", name="uq_agency_account"),)
