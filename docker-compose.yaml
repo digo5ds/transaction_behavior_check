@@ -3,7 +3,7 @@ version: "3.8"
 services:
 
   postgres:
-    image: postgres:15
+    image: postgres
     container_name: "${POSTGRES_CONTAINER_NAME}"
     restart: always
     ports:
@@ -18,7 +18,7 @@ services:
       - backend
 
   mongo:
-    image: mongo:6
+    image: mongo
     container_name: "${MONGO_CONTAINER_NAME}"
     restart: always
     ports:

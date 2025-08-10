@@ -6,7 +6,7 @@ ENV PYTHONPATH=/transactions
 
 COPY requirements.txt .
 
-RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y postgresql-client dos2unix && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -17,9 +17,9 @@ RUN rm requirements.txt
 
 COPY app/ app/
 
-COPY wait-for-it.sh .
-
 COPY entrypoint.sh .
+
+RUN dos2unix entrypoint.sh
 
 EXPOSE 8000
 
