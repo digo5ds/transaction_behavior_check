@@ -34,8 +34,9 @@ E que cada agência e origem possa ter um cadastro em um banco não relacionado 
 ## Regras pré-definidas para considerar uma transação suspeita
 * Horário incompatível com o canal
 	- transação com um teller (caixa) antes das 10:00 e após as 16:00
-	- Valor alto em ATM de madrugada
-	- Múltiplas transações iguais via IBK ou MBK
+- Valor alto em ATM de madrugada 
+
+- Múltiplas transações iguais via IBK ou MBK
 * Transações repetidas em espaço curto de tempo com valores próximos
 * Transações com valores altos para destinos não muito frequentes
 * Transações incomuns de usuários da terceira idade em canais digitais

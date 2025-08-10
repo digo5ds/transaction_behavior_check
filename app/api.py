@@ -1,16 +1,18 @@
 """FastAPI application entry point."""
 
+import json
+
 from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.__version__ import get_version
 from app.core.config import APPLICATION_PORT, FASTAPI_CONFIG
-from app.migrate import migrate_all
+from app.helpers.mongo_helper import MongoHelper
+from app.models.collections.rules_model import Rule
 from app.routes.customer_routes import router as customer_router
 from app.routes.transaction_routes import router as transaction_router
 
-migrate_all()
 app = FastAPI(**FASTAPI_CONFIG)
 
 
@@ -36,6 +38,24 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 
+@app.get("/rules")
+def get_rules():
+    """
+    Retrieves the list of known destinations.
+
+    This endpoint is used to retrieve the list of known destination accounts,
+    which are used to evaluate the risk of a transaction.
+
+    Returns:
+        List[KnowlegedDestinations]: A list of known destination accounts.
+    """
+    mongo_helper = MongoHelper()
+    result = [rule.to_mongo().to_dict() for rule in mongo_helper.find_documents(Rule)]
+    for item in result:
+        item.pop("_id")
+    return result
+
+
 @app.get("/", include_in_schema=False)
 def docs():
     """
@@ -44,7 +64,6 @@ def docs():
     This endpoint is not included in the OpenAPI schema, serving only as
     a convenience for users to quickly access the documentation.
     """
-
     return RedirectResponse(url="/docs")
 
 

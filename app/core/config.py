@@ -7,13 +7,13 @@ from app.__version__ import get_version
 POSTGRES_USER = os.getenv("POSTGRES_USER")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 POSTGRES_DB = os.getenv("POSTGRES_DB")
-POSTGRES_PORT = int(os.getenv("POSTGRES_PORT"))
+POSTGRES_PORT = 5432
 POSTGRES_HOST = os.getenv("POSTGRES_CONTAINER_NAME")
 # MongoDB
 MONGO_USERNAME = os.getenv("MONGO_USERNAME")
 MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
-MONGO_PORT = int(os.getenv("MONGO_PORT"))
-MONGO_DB = os.getenv("MONGO_DB")
+MONGO_PORT = 27017
+MONGO_DB = "test"
 MONGO_HOST = os.getenv("MONGO_CONTAINER_NAME")
 
 APPLICATION_PORT = int(os.getenv("APPLICATION_PORT"))

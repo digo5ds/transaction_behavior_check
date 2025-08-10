@@ -1,18 +1,29 @@
 FROM python:3.12-slim
-WORKDIR /app
+
+WORKDIR /transactions
+
+ENV PYTHONPATH=/transactions
 
 COPY requirements.txt .
 
-ENV PYTHONPATH=/app
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY alembic.ini .
+COPY alembic ./alembic
+
 RUN rm requirements.txt
 
-COPY app .
+COPY app/ app/
 
-RUN python manage.py 
+COPY wait-for-it.sh .
 
-EXPOSE 5001
+COPY entrypoint.sh .
 
-CMD ["python", "api.py"]
+EXPOSE 8000
+
+ENTRYPOINT ["sh", "entrypoint.sh"]
+
+
+CMD ["python", "app/api.py"]
