@@ -7,7 +7,7 @@ services:
     container_name: "${POSTGRES_CONTAINER_NAME}"
     restart: always
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -22,12 +22,25 @@ services:
     container_name: "${MONGO_CONTAINER_NAME}"
     restart: always
     ports:
-      - "${MONGO_PORT}:27017"
+      - "27017:27017"          
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     volumes:
       - mongodata:/data/db
+    networks:
+      - backend
+
+  transaction-behavior-check:
+    context: ../../
+    build: Dockerfile  
+    container_name: transaction-behavior-check
+    restart: always
+    ports:
+      - "${APPLICATION_PORT}:${APPLICATION_PORT}"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     networks:
       - backend
 
@@ -37,3 +50,4 @@ volumes:
 
 networks:
   backend:
+    driver: bridge

@@ -5,10 +5,12 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.__version__ import get_version
-from app.core.config import FASTAPI_CONFIG
+from app.core.config import APPLICATION_PORT, FASTAPI_CONFIG
+from app.migrate import migrate_all
 from app.routes.customer_routes import router as customer_router
 from app.routes.transaction_routes import router as transaction_router
 
+migrate_all()
 app = FastAPI(**FASTAPI_CONFIG)
 
 
@@ -66,4 +68,4 @@ app.include_router(api_router)
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("app.api:app", host="0.0.0.0", port=5001, reload=True)
+    uvicorn.run("app.api:app", host="0.0.0.0", port=APPLICATION_PORT, reload=True)

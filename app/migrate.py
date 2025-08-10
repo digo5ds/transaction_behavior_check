@@ -5,7 +5,7 @@ import alembic
 from app.core.constants import INITIAL_RULES
 from app.core.mongo_database import mongo_connection
 from app.helpers.mongo_helper import MongoHelper
-from app.models.collections.requests_model import RequestLog
+from app.models.collections.requests_log_model import RequestLog
 from app.models.collections.rules_model import Rule
 from app.models.collections.user_cache_model import KnowlegedDestinations
 
@@ -51,7 +51,7 @@ def populate_rules():
     # migrate_postgres()
 
 
-if __name__ == "__main__":
+def migrate_all():
     try:
         migrate_mongo()
         populate_rules()
