@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+
+  postgres:
+    image: postgres
+    container_name: "${POSTGRES_CONTAINER_NAME}"
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  mongo:
+    image: mongo
+    container_name: "${MONGO_CONTAINER_NAME}"
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongodata:/data/db
+    networks:
+      - backend
+
+  transaction-behavior-check:
+      build:
+        dockerfile: Dockerfile
+        context: .
+      container_name: transaction-behavior-check
+      restart: always
+      ports:
+        - "${APPLICATION_PORT}:${APPLICATION_PORT}"
+      environment:
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB}
+        POSTGRES_CONTAINER_NAME: ${POSTGRES_CONTAINER_NAME}
+        MONGO_USERNAME: ${MONGO_USERNAME}
+        MONGO_PASSWORD: ${MONGO_PASSWORD}
+        MONGO_CONTAINER_NAME: ${MONGO_CONTAINER_NAME}
+        APPLICATION_PORT: ${APPLICATION_PORT}
+      networks:
+        - backend
+      depends_on:
+        - postgres
+        - mongo
+
+volumes:
+  pgdata:
+  mongodata:
+
+networks:
+  backend:
+    driver: bridge
