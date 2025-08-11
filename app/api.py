@@ -1,7 +1,5 @@
 """FastAPI application entry point."""
 
-import json
-
 from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse

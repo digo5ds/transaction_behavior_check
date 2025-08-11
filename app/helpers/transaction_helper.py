@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.core.logger import logger
 from app.core.postgres_database import get_db
 from app.interfaces.transaction_interface import TransactionInterface
 from app.models.tables.transaction_model import Transaction
@@ -32,7 +33,6 @@ class TransactionHelper(TransactionInterface):
                 db.refresh(transaction)
                 return transaction
             except SQLAlchemyError as e:
-                # TODO: implements logger
                 db.rollback()
                 raise e
 
@@ -82,5 +82,6 @@ class TransactionHelper(TransactionInterface):
                     .all()
                 )
             except SQLAlchemyError as e:
+                logger.error("Error counting transactions", exc_info=True)
                 db.rollback()
                 raise e

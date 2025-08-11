@@ -5,6 +5,7 @@ from datetime import datetime, time, timedelta
 from typing import Any, Callable, Dict, List, Union
 
 from app.core.constants import ChannelEnum
+from app.core.logger import logger
 from app.helpers.mongo_helper import MongoHelper
 from app.helpers.transaction_helper import TransactionHelper
 from app.models.collections.rules_model import Rule
@@ -89,8 +90,13 @@ class RiskEvaluator:
             destination_account_id=destination_account_id,
         )
         transaction_values = [
-            float(item[1]) for item in result if item[0] in channels
-        ] or [0]
+            [float(item[1]), item[4]] for item in result if item[0] in channels
+        ] or []
+        transaction_values = [
+            value for value, count in transaction_values for _ in range(count)
+        ]
+        if not transaction_values:
+            return 0
         if variation:
             median = statistics.median(transaction_values)
             lower_bound = median * (1 - variation)
@@ -98,6 +104,7 @@ class RiskEvaluator:
             return len(
                 [v for v in transaction_values if lower_bound <= v <= upper_bound]
             )
+
         return len(transaction_values)
 
     def __destination_account_frequency(
@@ -207,10 +214,6 @@ class RiskEvaluator:
 
         if isinstance(condition, dict):
             if "and" in condition:
-                # for item in condition["and"]:
-                #     if not self.evaluate_condition(item, transaction):
-                #         print(item)
-                #         self.evaluate_condition(item, transaction)
                 return all(
                     self.evaluate_condition(sub, transaction)
                     for sub in condition["and"]
@@ -274,5 +277,10 @@ class RiskEvaluator:
             for block in rule_blocks:
                 filter_dict = block.get("filter")
                 if filter_dict and self.evaluate_condition(filter_dict, transaction):
+                    logger.info(
+                        "Transaction matched rule, this trahsaction is suspect: rule: %s",
+                        filter_dict,
+                    )
+
                     return True
         return False

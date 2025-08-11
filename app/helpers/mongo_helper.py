@@ -3,6 +3,7 @@ from typing import List, Optional, Type
 from mongoengine import Document
 from pymongo.errors import PyMongoError
 
+from app.core.logger import logger
 from app.core.mongo_database import mongo_connection
 from app.interfaces.mongo_helper_interface import MongoHelperInterface
 
@@ -26,6 +27,7 @@ class MongoHelper(MongoHelperInterface):
             try:
                 document.save()
             except PyMongoError as e:
+                logger.error("Error saving document", exc_info=True)
                 raise e
 
     def find_documents(
@@ -56,7 +58,7 @@ class MongoHelper(MongoHelperInterface):
 
                 if limit > 0:
                     query = query.limit(limit)
-
                 return list(query)
             except PyMongoError as e:
+                logger.error("Error finding documents", exc_info=True)
                 raise e
