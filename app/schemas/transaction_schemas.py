@@ -3,9 +3,11 @@
 import hashlib
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Union
 
 from pydantic import BaseModel, Field
+
+from app.core.constants import ChannelEnum
 
 
 class PutTransactionRequest(BaseModel):
@@ -64,7 +66,13 @@ class PutTransactionRequest(BaseModel):
     conta_de_destino: Annotated[
         int, Field(..., ge=0, description="Destination account number")
     ]
-    canal: Annotated[int, Field(..., ge=0, description="Channel code")]
+    canal: Annotated[
+        Union[int, Literal["ATM", "TELLER", "INTERNET_BANKING", "MOBILE_BANKING"]],
+        Field(
+            ...,
+            description="Transaction channel: either integer code or one of the predefined strings",
+        ),
+    ]
 
 
 class TransactionSummary(BaseModel):

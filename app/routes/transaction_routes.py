@@ -80,9 +80,15 @@ def put_transaction(data: PutTransactionRequest):
         )
 
     risk_evaluator = RiskEvaluator()
+
     try:
-        channel = ChannelEnum(data.canal)
-    except ValueError as e:
+        if isinstance(data.canal, int):
+            channel = ChannelEnum(data.canal)
+        elif data.canal in [member.name for member in ChannelEnum]:
+            channel = ChannelEnum[data.canal]
+        else:
+            raise ValueError
+    except (ValueError, KeyError) as e:
         logger.error(
             "Invalid channel code, use one of the following values: %s",
             [member.name for member in ChannelEnum],
