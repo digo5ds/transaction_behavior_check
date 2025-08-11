@@ -4,6 +4,12 @@
 > [!WARNING]
 > Necessário ter o docker instalado.
 
+>  [!WARNING]
+> Utilize o .env e o docker-compose apenas em ambientes de desenvolvimento ou de testes locais.
+
+- Pela rota ```/docs``` (Swagger) é possível ter uma visão geral e testar as rotas.
+- A porta padrão é 8000, mas é possível altera-la via arquivo .env 
+
 
 # Teste - Back End Topaz
 
