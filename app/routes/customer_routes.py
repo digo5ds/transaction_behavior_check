@@ -56,7 +56,7 @@ def put_customer(agencia: int, conta: int, data: PutCustomerRequest):
             logger.error("Database error: Duplicate key", exc_info=True)
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="Accout (agency/account) already exists",
+                detail="Account (agency/account) already exists",
             ) from e
 
 
