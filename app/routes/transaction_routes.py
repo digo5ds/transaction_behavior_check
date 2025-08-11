@@ -37,7 +37,6 @@ def put_transaction(data: PutTransactionRequest):
         data.agencia_de_origem == data.agencia_de_destino
         and data.conta_de_origem == data.conta_de_destino
     ):
-        # Use o estilo %s para lazy evaluation
         logger.error(
             "Origin and destination accounts cannot be the same: %s/%s",
             data.agencia_de_origem,
@@ -59,7 +58,6 @@ def put_transaction(data: PutTransactionRequest):
     )
     origin_account = account_helper.get_account(origin_account)
     if not origin_account:
-        # Use o estilo %s para lazy evaluation
         logger.error(
             "Origin account not found (agency/account) %s/%s",
             data.agencia_de_origem,
@@ -71,7 +69,6 @@ def put_transaction(data: PutTransactionRequest):
         )
     dest_account = account_helper.get_account(dest_account)
     if not dest_account:
-        # Use o estilo %s para lazy evaluation
         logger.error(
             "Destination account not found (agency/account) %s/%s",
             data.agencia_de_destino,
@@ -86,7 +83,6 @@ def put_transaction(data: PutTransactionRequest):
     try:
         channel = ChannelEnum(data.canal)
     except ValueError as e:
-        # Use o estilo %s e a mensagem do HTTPException
         logger.error(
             "Invalid channel code, use one of the following values: %s",
             [member.name for member in ChannelEnum],
@@ -118,21 +114,18 @@ def put_transaction(data: PutTransactionRequest):
         logger.info("Transaction created %s", transaction.id)
 
     except (SQLAlchemyError, IntegrityError) as e:
-        if "duplicate key" in str(getattr(e.orig, "diag", "")).lower():
-            # Use uma mensagem mais genérica, pois o exc_info=True já captura o detalhe
+        if "duplicate key" in str(e.orig).lower():
             logger.error("Database error: Duplicate key", exc_info=True)
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Transaction already exists",
             ) from e
-        # Use uma mensagem mais genérica
         logger.error("Database error", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
         ) from e
 
     except Exception as e:
-        # Use uma mensagem mais genérica
         logger.error("An unexpected error occurred", exc_info=True)
         raise HTTPException(
             status_code=status.WS_1011_INTERNAL_ERROR, detail=str(e)

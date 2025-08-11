@@ -65,3 +65,11 @@ class CustomerHelper(CustomerInterface):
             except SQLAlchemyError as e:
                 db.rollback()
                 raise e
+
+    def delete(self, customer: Customer):
+        try:
+            with get_db() as db:
+                db.delete(customer)
+                db.commit()
+        except SQLAlchemyError as e:
+            raise e

@@ -48,12 +48,16 @@ def put_customer(agencia: int, conta: int, data: PutCustomerRequest):
         account.customer_id = customer.id
         account_helper.save_account(account=account)
         logger.info("Customer created with ID: %s", customer.id)
+        return {"message": "Created"}
+
     except IntegrityError as e:
-        logger.error("IntegrityError occurred while creating customer")
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="Customer already exists"
-        ) from e
-    return {"message": "Created"}
+        if "duplicate key" in str(e.orig).lower():
+            customer_helper.delete(customer)
+            logger.error("Database error: Duplicate key", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Transaction already exists",
+            ) from e
 
 
 @router.get("/{agencia}/{conta}")

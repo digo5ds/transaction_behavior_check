@@ -41,3 +41,18 @@ class CustomerInterface(ABC):
             SQLAlchemyError: If an error occurs during the database query.
         """
         raise NotImplementedError()
+
+    def delete(self, customer: Customer):
+        """
+        Deletes a customer by their customer ID.
+
+        Args:
+            customer (Customer): The customer object containing the ID to be deleted.
+
+        Returns:
+            Customer: The deleted customer object.
+
+        Raises:
+            SQLAlchemyError: If an error occurs during the database query.
+        """
+        raise NotImplementedError()
