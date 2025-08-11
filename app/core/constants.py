@@ -17,5 +17,6 @@ class ChannelEnum(enum.IntEnum):
     ATM = 0
     TELLER = 1
     INTERNET_BANKING = 2
+    IBK = 2
     MOBILE_BANKING = 3
     MBK = 3
