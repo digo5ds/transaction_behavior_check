@@ -1,3 +1,10 @@
+# Teste - Inicialização Local
+- Executar na raiz do projeto
+  ```docker-compose up```
+> [!WARNING]
+> Necessário ter o docker instalado.
+
+
 # Teste - Back End Topaz
 
 # Objetivo
